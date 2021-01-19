@@ -11,6 +11,9 @@ import {
   Button,
   Placeholder,
   Message,
+  Icon,
+  Popup,
+  Modal
 } from "semantic-ui-react";
 
 function App() {
@@ -43,83 +46,53 @@ function App() {
     callNewList();
   };
 
-  const newList = () => {
-    return isLoading ? (
+  function copyIOS(string){
+    var textarea = document.createElement('textarea');
+    textarea.value = string;
+  
+    document.body.appendChild(textarea);
+    textarea.select();
+    textarea.setSelectionRange(0, 9999);  // 추가
+  
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+  }
+
+  function RemoveAlertModal() {
+    return (
+      <Modal
+        size={'mini'}
+        trigger={<Button negative>Remove All</Button>}
+        header='Reminder!'
+        content='New Code List will be REMOVED all.'
+        actions={['Cancel', { key: 'done', content: 'Done', negative: true, onClick:()=>{console.log(callClearNewList())} }]}
+      />
+    )
+  }
+
+  const loader = () => {
+    return (
       <Placeholder>
-        <Placeholder.Paragraph>
-          <Placeholder.Line />
-          <Placeholder.Line />
-          <Placeholder.Line />
-          <Placeholder.Line />
-          <Placeholder.Line />
-        </Placeholder.Paragraph>
-        <Placeholder.Paragraph>
-          <Placeholder.Line />
-          <Placeholder.Line />
-          <Placeholder.Line />
-        </Placeholder.Paragraph>
-        <Placeholder.Paragraph>
-          <Placeholder.Line />
-          <Placeholder.Line />
-          <Placeholder.Line />
-          <Placeholder.Line />
-          <Placeholder.Line />
-        </Placeholder.Paragraph>
-        <Placeholder.Paragraph>
-          <Placeholder.Line />
-          <Placeholder.Line />
-          <Placeholder.Line />
-        </Placeholder.Paragraph>
-        <Placeholder.Paragraph>
-          <Placeholder.Line />
-          <Placeholder.Line />
-          <Placeholder.Line />
-          <Placeholder.Line />
-          <Placeholder.Line />
-        </Placeholder.Paragraph>
-        <Placeholder.Paragraph>
-          <Placeholder.Line />
-          <Placeholder.Line />
-          <Placeholder.Line />
-        </Placeholder.Paragraph>
-        <Placeholder.Paragraph>
-          <Placeholder.Line />
-          <Placeholder.Line />
-          <Placeholder.Line />
-          <Placeholder.Line />
-          <Placeholder.Line />
-        </Placeholder.Paragraph>
-        <Placeholder.Paragraph>
-          <Placeholder.Line />
-          <Placeholder.Line />
-          <Placeholder.Line />
-        </Placeholder.Paragraph>
-        <Placeholder.Paragraph>
-          <Placeholder.Line />
-          <Placeholder.Line />
-          <Placeholder.Line />
-          <Placeholder.Line />
-          <Placeholder.Line />
-        </Placeholder.Paragraph>
-        <Placeholder.Paragraph>
-          <Placeholder.Line />
-          <Placeholder.Line />
-          <Placeholder.Line />
-        </Placeholder.Paragraph>
-        <Placeholder.Paragraph>
-          <Placeholder.Line />
-          <Placeholder.Line />
-          <Placeholder.Line />
-          <Placeholder.Line />
-          <Placeholder.Line />
-        </Placeholder.Paragraph>
-        <Placeholder.Paragraph>
-          <Placeholder.Line />
-          <Placeholder.Line />
-          <Placeholder.Line />
-        </Placeholder.Paragraph>
+        {
+          [...Array(10).keys()].map(item => {
+            return (
+              <Placeholder.Paragraph key={item}>
+                <Placeholder.Line />
+                <Placeholder.Line />
+                <Placeholder.Line />
+                <Placeholder.Line />
+                <Placeholder.Line />
+              </Placeholder.Paragraph>
+            )
+          })
+        }
       </Placeholder>
-    ) : itemList.length === 0 ? (
+    )
+  }
+
+  const newList = () => {
+    return isLoading ? loader() : 
+    itemList.length === 0 ? (
       <Message info>
         <Message.Header>No Item in Currently..</Message.Header>
         <p>Come back after few Hours.. See you!</p>
@@ -128,7 +101,7 @@ function App() {
       <Item.Group divided style={{ marginLeft: "1rem" }}>
         {itemList.map((item) => {
           return (
-            <Item>
+            <Item key={item.code}>
               <Item.Content as="a" href={item.url} target="_blank">
                 <Item.Header>{item.name}</Item.Header>
                 <Item.Meta>{item.url}</Item.Meta>
@@ -148,18 +121,31 @@ function App() {
         return item.code;
       })
       .join("\n");
-    return (
+    return isLoading? loader() : (
       <Container>
-        <Button onClick={() => callClearNewList()}>Remove All</Button>
+
         <Segment>
           <Form>
             <TextArea
+              className="codelist"
               style={{ height: "50vh" }}
               placeholder="Empty New List.. :)"
               value={codelist}
             />
           </Form>
         </Segment>
+        <div style={{textAlign: 'right'}}>
+          <Popup
+            content='Copied!'
+            on='click'
+            pinned
+            trigger={<Button onClick={() => copyIOS(codelist)}>Copy to Clipboard</Button>}
+          />
+          {RemoveAlertModal()}
+          {/* <Button negative onClick={() => callClearNewList()}>Remove All</Button> */}
+        </div>
+
+        
       </Container>
     );
   };
@@ -167,9 +153,25 @@ function App() {
   return (
     <div className="App">
       <Container style={{ marginTop: "3em", marginBottom: "3em" }}>
-        <Header as="h1" style={{ marginLeft: "1rem" }}>
-          Rosemary
-        </Header>
+        <div style={{display: "flex", flexDirection: "row", justifyContent: "space-between"}}>
+          <Header as="h1" style={{ marginLeft: "1rem" }}>
+            Rosemary
+          </Header>
+          <Button icon onClick={() => callNewList()}>
+            <Icon name='redo'/>
+          </Button>
+        </div>
+        <div style={{display: "flex", textAlign:'right', flexDirection:'column', marginTop: "2em"}}>
+          <Header as='h6'>
+            Last Updated: { itemList[0] === undefined ? 'Loading..' : 
+                ((new Date(itemList[0].createdTimestamp._seconds * 1000)).toLocaleString())
+            }<br/><br/>
+            Next Updated: { itemList[0] === undefined ? 'Loading..' : 
+                ((new Date((itemList[0].createdTimestamp._seconds+4*3600) * 1000)).toLocaleString())
+              }
+          </Header>
+        </div>
+
         <Menu>
           <Menu.Item
             name="newlist"
