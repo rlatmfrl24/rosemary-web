@@ -24,7 +24,7 @@ function App() {
   const [pageState, setPageState] = useState("newlist");
   const [itemList, setItemList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const handleMenuClick = (e, { name }) => setPageState(name);
+  const handleMenuClick = (e, { name }) => setPageState(name);--
 
   useEffect(() => {
     callNewList();
@@ -123,7 +123,6 @@ function App() {
       .join("\n");
     return isLoading? loader() : (
       <Container>
-
         <Segment>
           <Form>
             <TextArea
@@ -144,8 +143,6 @@ function App() {
           {RemoveAlertModal()}
           {/* <Button negative onClick={() => callClearNewList()}>Remove All</Button> */}
         </div>
-
-        
       </Container>
     );
   };
