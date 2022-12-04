@@ -36,7 +36,10 @@ function App() {
     const data = await response.json();
     console.log("[msg]:: New list is Loaded.");
     setIsLoading(false);
-    setItemList(data);
+
+    // remove duplicates
+    const unique = [...new Set(data)];
+    setItemList(unique);
   };
 
   const callClearNewList = async () => {
