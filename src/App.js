@@ -37,8 +37,16 @@ function App() {
     console.log("[msg]:: New list is Loaded.");
     setIsLoading(false);
 
-    // remove duplicates
-    const unique = [...new Set(data)];
+    // remove duplicates by code
+    const unique = data.reduce((acc, current) => {
+      const x = acc.find((item) => item.code === current.code);
+      if (!x) {
+        return acc.concat([current]);
+      } else {
+        return acc;
+      }
+    }, []);
+
     setItemList(unique);
   };
 
