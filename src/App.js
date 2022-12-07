@@ -46,6 +46,8 @@ function App() {
         return acc;
       }
     }, []);
+    console.log("[msg]:: Duplicates are removed. (", unique.length, " items )");
+    console.log(unique);
 
     setItemList(unique);
   };
